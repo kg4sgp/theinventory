@@ -1,0 +1,27 @@
+name:                theinventory
+version:             1
+synopsis:            Inventory tracking API
+homepage:            https://github.com/kg4sgp/theinventory
+license:             BSD3
+license-file:        LICENSE
+author:              Ricky Elrod, Jimmy Carter, Kalyn Midkiff
+maintainer:          Ricky Elrod <ricky@elrod.me>
+maintainer:          Jimmy Carter <kg4sgp@gmail.com>
+-- maintainer:          Kalyn Midkiff <...>
+copyright:           (c) 2016 Ricky Elrod, Jimmy Carter, Kalyn Midkiff
+category:            Web
+build-type:          Simple
+extra-source-files:  README.md
+cabal-version:       >= 1.10
+
+executable theinventory
+  main-is:             Main.hs
+  -- other-modules:       
+  -- other-extensions:    
+  build-depends:       base >= 4 && < 5
+                     , servant >= 0.8 && < 0.9
+                     , servant-server >= 0.8 && < 0.9
+                     , wai >= 3.2 && < 3.3
+                     , warp >= 3.2 && < 3.3
+  hs-source-dirs:      src
+  default-language:    Haskell2010
