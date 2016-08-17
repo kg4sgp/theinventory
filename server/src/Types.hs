@@ -8,17 +8,19 @@ import qualified Data.Text as T
 data Tag =
   Tag { tagId :: Integer
       , tagName :: T.Text
+      , tagParentTag :: Maybe Integer
       } deriving (Eq, Ord, Show)
 
 instance FromJSON Tag where
   parseJSON (Object v) = Tag <$>
                          v .: "id" <*>
-                         v .: "name"
+                         v .: "name" <*>
+                         v .: "parent_tag"
   parseJSON _          = mempty
 
 instance ToJSON Tag where
-  toJSON (Tag tagId' tagName') =
-    object ["id" .= tagId', "name" .= tagName']
+  toJSON (Tag tagId' tagName' tagParentTag') =
+    object ["id" .= tagId', "name" .= tagName', "parent_tag" .= tagParentTag']
 
 data Item =
   Item { itemId :: Integer

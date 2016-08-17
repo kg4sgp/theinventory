@@ -8,10 +8,11 @@ import Types
 -- Tag
 
 instance FromRow Tag where
-  fromRow = Tag <$> field <*> field
+  fromRow = Tag <$> field <*> field <*> field
 
 instance ToRow Tag where
-  toRow (Tag tagId' tagName') = toRow (tagId', tagName')
+  toRow (Tag tagId' tagName' tagParentTag') =
+    toRow (tagId', tagName', tagParentTag')
 
 
 -- Row
