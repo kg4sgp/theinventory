@@ -1,6 +1,7 @@
 name:                theinventory
 version:             1
 synopsis:            Inventory tracking API
+description:         Inventory tracking API
 homepage:            https://github.com/kg4sgp/theinventory
 license:             BSD3
 license-file:        LICENSE
@@ -13,6 +14,7 @@ category:            Web
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >= 1.10
+tested-with:         GHC == 7.8.4, GHC == 7.10.3, GHC == 8.0.1
 
 executable theinventory-server
   main-is:             Server.hs
