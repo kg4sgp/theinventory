@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Main where
 
+import qualified Data.ByteString.Lazy.Char8 as LB
 import Control.Monad.IO.Class
 import Network.Wai
 import Network.Wai.Handler.Warp
@@ -17,11 +18,8 @@ tagsCreateEndpoint :: IDLessTag -> Handler Tag
 tagsCreateEndpoint tag = liftIO . createTag $ tag
 
 tagsInfoEndpoint :: Integer -> Handler Tag
-tagsInfoEndpoint tid = do
-  tagMay <- liftIO . selectTagById $ tid
-  case tagMay of
-    Just tag -> return tag
-    Nothing -> throwError (err404 { errBody = "No such tag" })
+tagsInfoEndpoint tid =
+  liftIO (selectTagById tid) >>= flip getOr404 "No such tag"
 
 server :: Server InventoryAPI
 server =
@@ -34,3 +32,7 @@ app = serve inventoryAPI server
 
 main :: IO ()
 main = run (fromIntegral serverPort) app
+
+getOr404 :: Maybe a -> LB.ByteString -> Handler a
+getOr404 (Just a) _ = return a
+getOr404 Nothing s = throwError (err404 { errBody = s })
