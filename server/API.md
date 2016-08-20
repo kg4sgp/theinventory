@@ -88,3 +88,43 @@ Clients must supply the following data
 {"parent_tag":1,"name":"cellphone","id":2}
 ```
 
+## GET /tags/info/:tag_id
+
+#### Authentication
+
+
+
+Clients must supply the following data
+
+
+#### Captures:
+
+- *tag_id*: (integer) the id number of the tag
+
+#### Response:
+
+- Status code 200
+- Headers: []
+
+- Supported content types are:
+
+    - `application/json`
+
+- 
+
+```javascript
+null
+```
+
+- When there is no parent tag
+
+```javascript
+{"parent_tag":null,"name":"communication","id":1}
+```
+
+- When specifying a parent tag
+
+```javascript
+{"parent_tag":1,"name":"cellphone","id":2}
+```
+

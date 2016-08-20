@@ -15,10 +15,14 @@ tagsEndpoint = liftIO getAllTags
 tagsCreateEndpoint :: IDLessTag -> Handler Tag
 tagsCreateEndpoint tag = liftIO . createTag $ tag
 
+tagsInfoEndpoint :: Integer -> Handler (Maybe Tag)
+tagsInfoEndpoint tid = liftIO . selectTagById $ tid
+
 server :: Server InventoryAPI
 server =
   tagsEndpoint
   :<|> tagsCreateEndpoint
+  :<|> tagsInfoEndpoint
 
 app :: Application
 app = serve inventoryAPI server

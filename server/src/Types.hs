@@ -12,6 +12,7 @@ import Servant
 type InventoryAPI =
   "tags" :> Get '[JSON] [Tag]
   :<|> "tags" :> "create" :> ReqBody '[JSON] IDLessTag :> Post '[JSON] Tag
+  :<|> "tags" :> "info" :> Capture "tag_id" Integer :> Get '[JSON] (Maybe Tag)
 
 inventoryAPI :: Proxy InventoryAPI
 inventoryAPI = Proxy
