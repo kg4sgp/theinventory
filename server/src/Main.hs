@@ -13,17 +13,22 @@ import Types
 type InventoryAPI =
   "hello" :> Get '[JSON] String
   :<|> "tags" :> Get '[JSON] [Tag]
+  :<|> "tags" :> "create" :> ReqBody '[JSON] IDLessTag :> Post '[JSON] Tag
 
 helloEndpoint :: String
 helloEndpoint = "hello world!"
 
-tagsEndpoint :: IO [Tag]
-tagsEndpoint = getAllTags
+tagsEndpoint :: Handler [Tag]
+tagsEndpoint = liftIO getAllTags
+
+tagsCreateEndpoint :: IDLessTag -> Handler Tag
+tagsCreateEndpoint tag = liftIO . createTag $ tag
 
 server :: Server InventoryAPI
 server =
   return helloEndpoint
-  :<|> liftIO tagsEndpoint
+  :<|> tagsEndpoint
+  :<|> tagsCreateEndpoint
 
 inventoryAPI :: Proxy InventoryAPI
 inventoryAPI = Proxy
