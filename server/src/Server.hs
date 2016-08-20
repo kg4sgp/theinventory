@@ -5,6 +5,7 @@ import Network.Wai
 import Network.Wai.Handler.Warp
 import Servant
 
+import Config
 import DB.SQLite
 import Types
 
@@ -23,4 +24,4 @@ app :: Application
 app = serve inventoryAPI server
 
 main :: IO ()
-main = run 8081 app
+main = run (fromIntegral serverPort) app
