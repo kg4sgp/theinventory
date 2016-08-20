@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Main where
 
 import Control.Monad.IO.Class
@@ -15,8 +16,12 @@ tagsEndpoint = liftIO getAllTags
 tagsCreateEndpoint :: IDLessTag -> Handler Tag
 tagsCreateEndpoint tag = liftIO . createTag $ tag
 
-tagsInfoEndpoint :: Integer -> Handler (Maybe Tag)
-tagsInfoEndpoint tid = liftIO . selectTagById $ tid
+tagsInfoEndpoint :: Integer -> Handler Tag
+tagsInfoEndpoint tid = do
+  tagMay <- liftIO . selectTagById $ tid
+  case tagMay of
+    Just tag -> return tag
+    Nothing -> throwError (err404 { errBody = "No such tag" })
 
 server :: Server InventoryAPI
 server =

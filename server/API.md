@@ -110,12 +110,6 @@ Clients must supply the following data
 
     - `application/json`
 
-- 
-
-```javascript
-null
-```
-
 - When there is no parent tag
 
 ```javascript
