@@ -1,10 +1,22 @@
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeOperators #-}
 module Types where
 
 import Data.Aeson
 import Data.Monoid (mempty)
 import qualified Data.Text as T
+import Servant
 
+-- | The main API type.
+type InventoryAPI =
+  "tags" :> Get '[JSON] [Tag]
+  :<|> "tags" :> "create" :> ReqBody '[JSON] IDLessTag :> Post '[JSON] Tag
+
+inventoryAPI :: Proxy InventoryAPI
+inventoryAPI = Proxy
+
+-- | A 'Tag' *after* it is added to the database (and thus has an id).
 data Tag =
   Tag { tagId :: Integer
       , tagName :: T.Text
@@ -22,6 +34,7 @@ instance ToJSON Tag where
   toJSON (Tag tagId' tagName' tagParentTag') =
     object ["id" .= tagId', "name" .= tagName', "parent_tag" .= tagParentTag']
 
+-- | An 'Item' *after* it is added to the datrabase (and thus has an id).
 data Item =
   Item { itemId :: Integer
        , itemName :: T.Text

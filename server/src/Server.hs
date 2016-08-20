@@ -1,5 +1,3 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeOperators #-}
 module Main where
 
 import Control.Monad.IO.Class
@@ -10,14 +8,6 @@ import Servant
 import DB.SQLite
 import Types
 
-type InventoryAPI =
-  "hello" :> Get '[JSON] String
-  :<|> "tags" :> Get '[JSON] [Tag]
-  :<|> "tags" :> "create" :> ReqBody '[JSON] IDLessTag :> Post '[JSON] Tag
-
-helloEndpoint :: String
-helloEndpoint = "hello world!"
-
 tagsEndpoint :: Handler [Tag]
 tagsEndpoint = liftIO getAllTags
 
@@ -26,12 +16,8 @@ tagsCreateEndpoint tag = liftIO . createTag $ tag
 
 server :: Server InventoryAPI
 server =
-  return helloEndpoint
-  :<|> tagsEndpoint
+  tagsEndpoint
   :<|> tagsCreateEndpoint
-
-inventoryAPI :: Proxy InventoryAPI
-inventoryAPI = Proxy
 
 app :: Application
 app = serve inventoryAPI server

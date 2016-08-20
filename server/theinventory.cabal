@@ -14,18 +14,28 @@ build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >= 1.10
 
-executable theinventory
-  main-is:             Main.hs
-  -- other-modules:
-  -- other-extensions:
+executable theinventory-server
+  main-is:             Server.hs
   build-depends:       aeson >= 0.11 && < 2
                      , base >= 4 && < 5
                      , servant >= 0.8 && < 0.9
+                     , servant-docs >= 0.8 && < 0.9
                      , servant-server >= 0.8 && < 0.9
                      , sqlite-simple >= 0.4 && < 0.5
                      , text >= 1 && < 2
                      , transformers >= 0.4 && < 0.6
                      , wai >= 3.2 && < 3.3
                      , warp >= 3.2 && < 3.3
+  hs-source-dirs:      src
+  default-language:    Haskell2010
+
+executable theinventory-docs
+  main-is:             Docgen.hs
+  build-depends:       aeson >= 0.11 && < 2
+                     , base >= 4 && < 5
+                     , servant >= 0.8 && < 0.9
+                     , servant-docs >= 0.8 && < 0.9
+                     , servant-server >= 0.8 && < 0.9
+                     , text >= 1 && < 2
   hs-source-dirs:      src
   default-language:    Haskell2010
