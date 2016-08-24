@@ -1,20 +1,33 @@
 # theinventory
-An attempt at making a custom inventory app among friends in our spare time.
 
-Thoughts on Requirements
-========================
+This is a collection of components used for a simplistic inventory tracking
+suite.
 
-Basic Functionality:
+It currently consists of the following:
 
-* Optical code scanner (Bar code and QR code)
-* Inventory recheck function (make sure everything is accounted for)
-* Rating system for items (ex: color/shape/number)
-* Info query on item
-
-After achieveing the above continue to the following:
-
-* Custom tags/categories for items (location, DVDs, games etc)
-* Exportable to spread sheet
-* Items history in inventory?
-* Multi-user access to inventory
-* Pictures of items
+<table>
+<tr>
+  <th>Component</th>
+  <th>Description</th>
+  <th>Tooling</th>
+  <th>License</th>
+</tr>
+<tr>
+  <td><a href="./server/">server</a></td>
+  <td>
+    The API that stores inventory data in a database and allows access via
+    HTTP + JSON.
+  </td>
+  <td>Haskell (servant)</td>
+  <td>3-BSD</td>
+</tr>
+<tr>
+  <td><a href="./android/">android</a></td>
+  <td>
+    The Android application, which also bundles a Scala/httpz library for
+    accessing the API. (TODO: Unbundle this)
+  </td>
+  <td>Scala (sbt-android, httpz), Android tooling</td>
+  <td>3-BSD</td>
+</tr>
+</table>
