@@ -4,18 +4,35 @@ import android.app.Activity
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.graphics.drawable.Animatable
+import android.widget.TextView
+import httpz.native._
+import scalaz._
+import Scalaz._
+import scalaz.concurrent.Task
+
+
+import client._
 
 class MainActivity extends AppCompatActivity {
-    // allows accessing `.value` on TR.resource.constants
-    implicit val context = this
+  implicit val context = this
 
-    override def onCreate(savedInstanceState: Bundle): Unit = {
-        super.onCreate(savedInstanceState)
-        val vh = TypedViewHolder.setContentView(this, TR.layout.main)
-        vh.text.setText(s"Hello world, from ${TR.string.app_name.value}")
-        vh.image.getDrawable match {
-          case a: Animatable => a.start()
-          case _ => // not animatable
-        }
-    }
+  def getTags: Task[httpz.Error \/ IList[Tag]] = GetTags().action.task
+
+  def setDemoText(vh: TypedViewHolder.main, s: String): Task[Unit] = for {
+    _ <- Task(vh.text.setText(s))
+  } yield ()
+
+  def main(savedInstanceState: Bundle): Task[Unit] =
+    for {
+      _ <- Task(super.onCreate(savedInstanceState))
+      vh <- Task(TypedViewHolder.setContentView(this, TR.layout.main))
+      tags <- getTags
+      _ <- setDemoText(vh, tags.toString)
+    } yield ()
+
+
+  // This is considered the "end of the world"
+  // We call run our otherwise purely functional code above here.
+  override def onCreate(savedInstanceState: Bundle): Unit =
+    main(savedInstanceState).unsafePerformSync
 }
