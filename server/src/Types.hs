@@ -6,16 +6,17 @@ module Types where
 import Data.Aeson
 import Data.Monoid (mempty)
 import qualified Data.Text as T
+import Data.Time.Clock (UTCTime)
 import Servant
 
 -- | The main API type.
 type InventoryAPI =
   "tags" :> Get '[JSON] [Tag]
-  :<|> "tags" :> "create" :> ReqBody '[JSON] IDLessTag :> Post '[JSON] Tag
+  :<|> "tags" :> "create" :> ReqBody '[JSON] IDLessTag :> Post '[JSON] (Maybe Tag)
   :<|> "tags" :> "info" :> Capture "tag_id" Integer :> Get '[JSON] Tag
   :<|> "tags" :> "items" :> Capture "tag_id" Integer :> Get '[JSON] [Item]
   :<|> "items" :> Get '[JSON] [Item]
-  :<|> "items" :> "create" :> ReqBody '[JSON] IDLessItem :> Post '[JSON] Item
+  :<|> "items" :> "create" :> ReqBody '[JSON] IDLessItem :> Post '[JSON] (Maybe Item)
   :<|> "items" :> "info" :> Capture "item_id" Integer :> Get '[JSON] Item
 
 inventoryAPI :: Proxy InventoryAPI
@@ -26,18 +27,24 @@ data Tag =
   Tag { tagId :: Integer
       , tagName :: T.Text
       , tagParentTag :: Maybe Integer
+      , tagCreationDt :: UTCTime
       } deriving (Eq, Ord, Show)
 
 instance FromJSON Tag where
   parseJSON (Object v) = Tag <$>
                          v .: "id" <*>
                          v .: "name" <*>
-                         v .: "parent_tag"
+                         v .: "parent_tag" <*>
+                         v .: "creation_time"
   parseJSON _          = mempty
 
 instance ToJSON Tag where
-  toJSON (Tag tagId' tagName' tagParentTag') =
-    object ["id" .= tagId', "name" .= tagName', "parent_tag" .= tagParentTag']
+  toJSON (Tag tagId' tagName' tagParentTag' tagCreationDt') =
+    object [ "id" .= tagId'
+           , "name" .= tagName'
+           , "parent_tag" .= tagParentTag'
+           , "creation_time" .= tagCreationDt'
+           ]
 
 -- | A 'Tag' without an id number associated with it.
 --
@@ -62,9 +69,9 @@ instance ToJSON IDLessTag where
     object ["name" .= tagName', "parent_tag" .= tagParentTag']
 
 -- | An injection from 'IDLessTag' to 'Tag'.
-idLessTagToTag :: IDLessTag -> Integer -> Tag
-idLessTagToTag (IDLessTag idLessTagName' idLessTagParentTag') tid =
-  Tag tid idLessTagName' idLessTagParentTag'
+idLessTagToTag :: IDLessTag -> Integer -> UTCTime -> Tag
+idLessTagToTag (IDLessTag idLessTagName' idLessTagParentTag') tid time =
+  Tag tid idLessTagName' idLessTagParentTag' time
 
 -- | An 'Item' *after* it is added to the datrabase (and thus has an id).
 data Item =
@@ -72,6 +79,7 @@ data Item =
        , itemName :: T.Text
        , itemRating :: Float
        , itemBarcode :: T.Text
+       , itemCreationDt :: UTCTime
        } deriving (Eq, Ord, Show)
 
 instance FromJSON Item where
@@ -79,15 +87,17 @@ instance FromJSON Item where
                          v .: "id" <*>
                          v .: "name" <*>
                          v .: "rating" <*>
-                         v .: "barcode"
+                         v .: "barcode" <*>
+                         v .: "creation_time"
   parseJSON _          = mempty
 
 instance ToJSON Item where
-  toJSON (Item itemId' itemName' itemRating' itemBarcode') =
+  toJSON (Item itemId' itemName' itemRating' itemBarcode' itemCreationDt') =
     object [ "id" .= itemId'
            , "name" .= itemName'
            , "rating" .= itemRating'
            , "barcode" .= itemBarcode'
+           , "creation_time" .= itemCreationDt'
            ]
 
 -- | An 'Item' *before* it is added to the datrabase (and thus has no id).
@@ -112,9 +122,9 @@ instance ToJSON IDLessItem where
            ]
 
 -- | An injection from 'IDLessItem' to 'Item'.
-idLessItemToItem :: IDLessItem -> Integer -> Item
-idLessItemToItem (IDLessItem name rating barcode) iid =
-  Item iid name rating barcode
+idLessItemToItem :: IDLessItem -> Integer -> UTCTime -> Item
+idLessItemToItem (IDLessItem name rating barcode) iid time =
+  Item iid name rating barcode time
 
 -- | An 'TagItem' *after* it is added to the datrabase (and thus has an id).
 --
@@ -123,20 +133,23 @@ data TagItem =
   TagItem { tagItemId :: Integer
           , tagItemTagId :: Integer
           , tagItemItemId :: Integer
+          , tagItemCreationDt :: UTCTime
           } deriving (Eq, Ord, Show)
 
 instance FromJSON TagItem where
   parseJSON (Object v) = TagItem <$>
                          v .: "id" <*>
                          v .: "tag_id" <*>
-                         v .: "item_id"
+                         v .: "item_id" <*>
+                         v .: "creation_dt"
   parseJSON _          = mempty
 
 instance ToJSON TagItem where
-  toJSON (TagItem tiid titid tiiid) =
+  toJSON (TagItem tiid titid tiiid ticdt) =
     object [ "id" .= tiid
            , "tag_id" .= titid
            , "item_id" .= tiiid
+           , "creation_dt" .= ticdt
            ]
 
 -- | An 'TagItem' *before* it is added to the datrabase (and thus has an id).
@@ -160,6 +173,6 @@ instance ToJSON IDLessTagItem where
            ]
 
 -- | An injection from 'IDTagItem' to 'TagItem'.
-idLessTagItemToTagItem :: IDLessTagItem -> Integer -> TagItem
-idLessTagItemToTagItem (IDLessTagItem titid tiiid) tiid =
-  TagItem tiid titid tiiid
+idLessTagItemToTagItem :: IDLessTagItem -> Integer -> UTCTime -> TagItem
+idLessTagItemToTagItem (IDLessTagItem titid tiiid) tiid time =
+  TagItem tiid titid tiiid time

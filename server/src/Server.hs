@@ -17,7 +17,7 @@ tagsEndpoint :: Handler [Tag]
 tagsEndpoint = liftIO getAllTags
 
 -- TODO: We need to make sure the parent tag is valid!!
-tagsCreateEndpoint :: IDLessTag -> Handler Tag
+tagsCreateEndpoint :: IDLessTag -> Handler (Maybe Tag)
 tagsCreateEndpoint tag = liftIO . createTag $ tag
 
 tagsInfoEndpoint :: Integer -> Handler Tag
@@ -32,7 +32,7 @@ tagsItemsEndpoint tid = liftIO (selectItemsByTagId tid)
 itemsEndpoint :: Handler [Item]
 itemsEndpoint = liftIO getAllItems
 
-itemsCreateEndpoint :: IDLessItem -> Handler Item
+itemsCreateEndpoint :: IDLessItem -> Handler (Maybe Item)
 itemsCreateEndpoint tag = liftIO . createItem $ tag
 
 itemsInfoEndpoint :: Integer -> Handler Item

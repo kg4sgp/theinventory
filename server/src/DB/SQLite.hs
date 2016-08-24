@@ -9,11 +9,11 @@ import Types
 -- Tag
 
 instance FromRow Tag where
-  fromRow = Tag <$> field <*> field <*> field
+  fromRow = Tag <$> field <*> field <*> field <*> field
 
 instance ToRow Tag where
-  toRow (Tag tagId' tagName' tagParentTag') =
-    toRow (tagId', tagName', tagParentTag')
+  toRow (Tag tagId' tagName' tagParentTag' tagCreationDt') =
+    toRow (tagId', tagName', tagParentTag', tagCreationDt')
 
 -- IDLessTag
 
@@ -24,11 +24,11 @@ instance ToRow IDLessTag where
 -- Item
 
 instance FromRow Item where
-  fromRow = Item <$> field <*> field <*> field <*> field
+  fromRow = Item <$> field <*> field <*> field <*> field <*> field
 
 instance ToRow Item where
-  toRow (Item itemId' itemName' itemRating' itemBarcode') =
-    toRow (itemId', itemName', itemRating', itemBarcode')
+  toRow (Item itemId' itemName' itemRating' itemBarcode' itemCreationDt') =
+    toRow (itemId', itemName', itemRating', itemBarcode', itemCreationDt')
 
 -- IDLessItem
 
@@ -38,10 +38,10 @@ instance ToRow IDLessItem where
 -- TagItem
 
 instance FromRow TagItem where
-  fromRow = TagItem <$> field <*> field <*> field
+  fromRow = TagItem <$> field <*> field <*> field <*> field
 
 instance ToRow TagItem where
-  toRow (TagItem tiid titid tiiid) = toRow (tiid, titid, tiiid)
+  toRow (TagItem tiid titid tiiid ticdt) = toRow (tiid, titid, tiiid, ticdt)
 
 -- IDLessTagItem
 
@@ -65,14 +65,12 @@ selectTagById tid = do
   conn <- open Config.sqliteDatabasePath
   listToMaybe <$> query conn "select * from tags where id=?;" (Only tid)
 
-createTag :: IDLessTag -> IO Tag
+createTag :: IDLessTag -> IO (Maybe Tag)
 createTag tag = do
   conn <- open Config.sqliteDatabasePath
   execute conn "insert into tags (name, parent_tag) values (?, ?);" tag
   rowId <- lastInsertRowId conn
-  -- TODO: Is it safe to rely on this? It saves a SELECT on the new row
-  -- but it assumes that the insertion was successful always.
-  return $ idLessTagToTag tag (fromIntegral rowId)
+  selectTagById (fromIntegral rowId)
 
 -- Items
 
@@ -86,14 +84,12 @@ selectItemById iid = do
   conn <- open Config.sqliteDatabasePath
   listToMaybe <$> query conn "select * from items where id=?;" (Only iid)
 
-createItem :: IDLessItem -> IO Item
+createItem :: IDLessItem -> IO (Maybe Item)
 createItem itm = do
   conn <- open Config.sqliteDatabasePath
   execute conn "insert into items (name, rating, barcode) values (?, ?, ?);" itm
   rowId <- lastInsertRowId conn
-  -- TODO: Is it safe to rely on this? It saves a SELECT on the new row
-  -- but it assumes that the insertion was successful always.
-  return $ idLessItemToItem itm (fromIntegral rowId)
+  selectItemById (fromIntegral rowId)
 
 -- TagItems
 
@@ -107,14 +103,12 @@ selectTagItemById tiid = do
   conn <- open Config.sqliteDatabasePath
   listToMaybe <$> query conn "select * from tags_items where id=?;" (Only tiid)
 
-createTagItem :: IDLessTagItem -> IO TagItem
+createTagItem :: IDLessTagItem -> IO (Maybe TagItem)
 createTagItem titm = do
   conn <- open Config.sqliteDatabasePath
   execute conn "insert into tags_items (tag_id, item_id) values (?, ?);" titm
   rowId <- lastInsertRowId conn
-  -- TODO: Is it safe to rely on this? It saves a SELECT on the new row
-  -- but it assumes that the insertion was successful always.
-  return $ idLessTagItemToTagItem titm (fromIntegral rowId)
+  selectTagItemById (fromIntegral rowId)
 
 selectItemsByTagId :: Integer -> IO [Item]
 selectItemsByTagId tid = do

@@ -26,6 +26,7 @@ executable theinventory-server
                      , servant-server >= 0.8 && < 0.9
                      , sqlite-simple >= 0.4 && < 0.5
                      , text >= 1 && < 2
+                     , time >= 1.4 && < 2
                      , transformers >= 0.4 && < 0.6
                      , wai >= 3.2 && < 3.3
                      , warp >= 3.2 && < 3.3
@@ -42,6 +43,7 @@ executable theinventory-docs
                      , servant-server >= 0.8 && < 0.9
                      , sqlite-simple >= 0.4 && < 0.5
                      , text >= 1 && < 2
+                     , time >= 1.4 && < 2
                      , transformers >= 0.4 && < 0.6
                      , wai >= 3.2 && < 3.3
                      , warp >= 3.2 && < 3.3
