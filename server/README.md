@@ -1,4 +1,4 @@
-# theinventory - server component
+# theinventory/server
 
 ### Setup
 
