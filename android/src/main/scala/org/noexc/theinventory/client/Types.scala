@@ -12,7 +12,7 @@ final case class Tag(
 
 object Tag {
   implicit val tagCodecJson: CodecJson[Tag] =
-    CodecJson.casecodec3(apply, unapply)(
+    CodecJson.casecodec4(apply, unapply)(
       "id",
       "name",
       "parent_tag",
