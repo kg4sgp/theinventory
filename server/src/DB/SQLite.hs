@@ -12,8 +12,8 @@ instance FromRow Tag where
   fromRow = Tag <$> field <*> field <*> field <*> field
 
 instance ToRow Tag where
-  toRow (Tag tagId' tagName' tagParentTag' tagCreationDt') =
-    toRow (tagId', tagName', tagParentTag', tagCreationDt')
+  toRow (Tag tagId' tagName' tagCreationDt' tagParentTag') =
+    toRow (tagId', tagName', tagCreationDt', tagParentTag')
 
 -- IDLessTag
 

@@ -26,24 +26,24 @@ inventoryAPI = Proxy
 data Tag =
   Tag { tagId :: Integer
       , tagName :: T.Text
-      , tagParentTag :: Maybe Integer
       , tagCreationDt :: UTCTime
+      , tagParentTag :: Maybe Integer
       } deriving (Eq, Ord, Show)
 
 instance FromJSON Tag where
   parseJSON (Object v) = Tag <$>
                          v .: "id" <*>
                          v .: "name" <*>
-                         v .: "parent_tag" <*>
-                         v .: "creation_time"
+                         v .: "creation_time" <*>
+                         v .: "parent_tag"
   parseJSON _          = mempty
 
 instance ToJSON Tag where
-  toJSON (Tag tagId' tagName' tagParentTag' tagCreationDt') =
+  toJSON (Tag tagId' tagName' tagCreationDt' tagParentTag') =
     object [ "id" .= tagId'
            , "name" .= tagName'
-           , "parent_tag" .= tagParentTag'
            , "creation_time" .= tagCreationDt'
+           , "parent_tag" .= tagParentTag'
            ]
 
 -- | A 'Tag' without an id number associated with it.
@@ -71,7 +71,7 @@ instance ToJSON IDLessTag where
 -- | An injection from 'IDLessTag' to 'Tag'.
 idLessTagToTag :: IDLessTag -> Integer -> UTCTime -> Tag
 idLessTagToTag (IDLessTag idLessTagName' idLessTagParentTag') tid time =
-  Tag tid idLessTagName' idLessTagParentTag' time
+  Tag tid idLessTagName' time idLessTagParentTag'
 
 -- | An 'Item' *after* it is added to the datrabase (and thus has an id).
 data Item =
