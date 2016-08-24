@@ -10,7 +10,6 @@
 * `dbm migrate development`
 * `cabal run theinventory-server`
 
-
 ### Generating docs
 
 * `cabal run theinventory-docs`

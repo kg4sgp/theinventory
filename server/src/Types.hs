@@ -13,6 +13,10 @@ type InventoryAPI =
   "tags" :> Get '[JSON] [Tag]
   :<|> "tags" :> "create" :> ReqBody '[JSON] IDLessTag :> Post '[JSON] Tag
   :<|> "tags" :> "info" :> Capture "tag_id" Integer :> Get '[JSON] Tag
+  :<|> "tags" :> "items" :> Capture "tag_id" Integer :> Get '[JSON] [Item]
+  :<|> "items" :> Get '[JSON] [Item]
+  :<|> "items" :> "create" :> ReqBody '[JSON] IDLessItem :> Post '[JSON] Item
+  :<|> "items" :> "info" :> Capture "item_id" Integer :> Get '[JSON] Item
 
 inventoryAPI :: Proxy InventoryAPI
 inventoryAPI = Proxy
@@ -34,30 +38,6 @@ instance FromJSON Tag where
 instance ToJSON Tag where
   toJSON (Tag tagId' tagName' tagParentTag') =
     object ["id" .= tagId', "name" .= tagName', "parent_tag" .= tagParentTag']
-
--- | An 'Item' *after* it is added to the datrabase (and thus has an id).
-data Item =
-  Item { itemId :: Integer
-       , itemName :: T.Text
-       , itemRating :: Float
-       , itemBarcode :: T.Text
-       } deriving (Eq, Ord, Show)
-
-instance FromJSON Item where
-  parseJSON (Object v) = Item <$>
-                         v .: "id" <*>
-                         v .: "name" <*>
-                         v .: "rating" <*>
-                         v .: "barcode"
-  parseJSON _          = mempty
-
-instance ToJSON Item where
-  toJSON (Item itemId' itemName' itemRating' itemBarcode') =
-    object [ "id" .= itemId'
-           , "name" .= itemName'
-           , "rating" .= itemRating'
-           , "barcode" .= itemBarcode'
-           ]
 
 -- | A 'Tag' without an id number associated with it.
 --
@@ -85,3 +65,101 @@ instance ToJSON IDLessTag where
 idLessTagToTag :: IDLessTag -> Integer -> Tag
 idLessTagToTag (IDLessTag idLessTagName' idLessTagParentTag') tid =
   Tag tid idLessTagName' idLessTagParentTag'
+
+-- | An 'Item' *after* it is added to the datrabase (and thus has an id).
+data Item =
+  Item { itemId :: Integer
+       , itemName :: T.Text
+       , itemRating :: Float
+       , itemBarcode :: T.Text
+       } deriving (Eq, Ord, Show)
+
+instance FromJSON Item where
+  parseJSON (Object v) = Item <$>
+                         v .: "id" <*>
+                         v .: "name" <*>
+                         v .: "rating" <*>
+                         v .: "barcode"
+  parseJSON _          = mempty
+
+instance ToJSON Item where
+  toJSON (Item itemId' itemName' itemRating' itemBarcode') =
+    object [ "id" .= itemId'
+           , "name" .= itemName'
+           , "rating" .= itemRating'
+           , "barcode" .= itemBarcode'
+           ]
+
+-- | An 'Item' *before* it is added to the datrabase (and thus has no id).
+data IDLessItem =
+  IDLessItem { idLessItemName :: T.Text
+             , idLessItemRating :: Float
+             , idLessItemBarcode :: T.Text
+             } deriving (Eq, Ord, Show)
+
+instance FromJSON IDLessItem where
+  parseJSON (Object v) = IDLessItem <$>
+                         v .: "name" <*>
+                         v .: "rating" <*>
+                         v .: "barcode"
+  parseJSON _          = mempty
+
+instance ToJSON IDLessItem where
+  toJSON (IDLessItem name rating barcode) =
+    object [ "name" .= name
+           , "rating" .= rating
+           , "barcode" .= barcode
+           ]
+
+-- | An injection from 'IDLessItem' to 'Item'.
+idLessItemToItem :: IDLessItem -> Integer -> Item
+idLessItemToItem (IDLessItem name rating barcode) iid =
+  Item iid name rating barcode
+
+-- | An 'TagItem' *after* it is added to the datrabase (and thus has an id).
+--
+-- This is an association between an 'Item' and a 'Tag'.
+data TagItem =
+  TagItem { tagItemId :: Integer
+          , tagItemTagId :: Integer
+          , tagItemItemId :: Integer
+          } deriving (Eq, Ord, Show)
+
+instance FromJSON TagItem where
+  parseJSON (Object v) = TagItem <$>
+                         v .: "id" <*>
+                         v .: "tag_id" <*>
+                         v .: "item_id"
+  parseJSON _          = mempty
+
+instance ToJSON TagItem where
+  toJSON (TagItem tiid titid tiiid) =
+    object [ "id" .= tiid
+           , "tag_id" .= titid
+           , "item_id" .= tiiid
+           ]
+
+-- | An 'TagItem' *before* it is added to the datrabase (and thus has an id).
+--
+-- This is an association between an 'Item' and a 'Tag'.
+data IDLessTagItem =
+  IDLessTagItem { idLessTagItemTagId :: Integer
+                , idLessTagItemItemId :: Integer
+                } deriving (Eq, Ord, Show)
+
+instance FromJSON IDLessTagItem where
+  parseJSON (Object v) = IDLessTagItem <$>
+                         v .: "tag_id" <*>
+                         v .: "item_id"
+  parseJSON _          = mempty
+
+instance ToJSON IDLessTagItem where
+  toJSON (IDLessTagItem titid tiiid) =
+    object [ "tag_id" .= titid
+           , "item_id" .= tiiid
+           ]
+
+-- | An injection from 'IDTagItem' to 'TagItem'.
+idLessTagItemToTagItem :: IDLessTagItem -> Integer -> TagItem
+idLessTagItemToTagItem (IDLessTagItem titid tiiid) tiid =
+  TagItem tiid titid tiiid
