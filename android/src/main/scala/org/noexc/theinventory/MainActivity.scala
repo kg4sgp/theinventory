@@ -10,7 +10,6 @@ import scalaz._
 import Scalaz._
 import scalaz.concurrent.Task
 
-
 import client._
 
 class MainActivity extends AppCompatActivity {
