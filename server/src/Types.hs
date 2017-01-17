@@ -73,7 +73,7 @@ idLessTagToTag :: IDLessTag -> Integer -> UTCTime -> Tag
 idLessTagToTag (IDLessTag idLessTagName' idLessTagParentTag') tid time =
   Tag tid idLessTagName' time idLessTagParentTag'
 
--- | An 'Item' *after* it is added to the datrabase (and thus has an id).
+-- | An 'Item' *after* it is added to the database (and thus has an id).
 data Item =
   Item { itemId :: Integer
        , itemName :: T.Text
@@ -100,7 +100,7 @@ instance ToJSON Item where
            , "creation_time" .= itemCreationDt'
            ]
 
--- | An 'Item' *before* it is added to the datrabase (and thus has no id).
+-- | An 'Item' *before* it is added to the database (and thus has no id).
 data IDLessItem =
   IDLessItem { idLessItemName :: T.Text
              , idLessItemRating :: Float
@@ -126,7 +126,7 @@ idLessItemToItem :: IDLessItem -> Integer -> UTCTime -> Item
 idLessItemToItem (IDLessItem name rating barcode) iid time =
   Item iid name rating barcode time
 
--- | An 'TagItem' *after* it is added to the datrabase (and thus has an id).
+-- | An 'TagItem' *after* it is added to the database (and thus has an id).
 --
 -- This is an association between an 'Item' and a 'Tag'.
 data TagItem =
@@ -152,7 +152,7 @@ instance ToJSON TagItem where
            , "creation_dt" .= ticdt
            ]
 
--- | An 'TagItem' *before* it is added to the datrabase (and thus has an id).
+-- | An 'TagItem' *before* it is added to the database (and thus has an id).
 --
 -- This is an association between an 'Item' and a 'Tag'.
 data IDLessTagItem =
